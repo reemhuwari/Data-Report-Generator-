@@ -22,6 +22,9 @@ app.use("/downloads", express.static(path.join(__dirname, "reports")));
 const reportRoutes = require("./routes/reports");
 app.use("/api/reports", reportRoutes);
 
+//user routes
+const userRoutes = require("./routes/user");
+app.use("/api/user", userRoutes);
 // Start server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
