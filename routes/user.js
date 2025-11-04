@@ -4,6 +4,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const UserModel = require("../models/User");
+require("dotenv").config();
 
 // ✅ تسجيل مستخدم جديد
 router.post("/register", async (req, res) => {
@@ -16,13 +17,12 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "User already exists!" });
 
     // تجزئة كلمة المرور
-    const hashedPassword = await bcrypt.hash(password, 10);
 
     // إنشاء المستخدم
     const userId = await UserModel.createUser({
       username,
       email,
-      password: hashedPassword,
+      password ,
       role,
     });
 
@@ -33,32 +33,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// ✅ تسجيل الدخول
-router.post("/login", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await UserModel.findByEmail(email);
-    if (!user) return res.status(400).json({ error: "Invalid email or password" });
-
-    // تحقق من كلمة المرور
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
-      return res.status(400).json({ error: "Invalid email or password" });
-
-    // إنشاء توكن JWT
-    const token = jwt.sign(
-      { id: user.id, role: user.role },
-      process.env.JWT_SECRET || "defaultsecret",
-      { expiresIn: "1d" }
-    );
-
-    res.json({ message: "Login successful!", token });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Login failed", detail: err.message });
-  }
-});
 
 
 // POST /api/user/login
@@ -70,18 +44,13 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    // تحقق من المستخدم في قاعدة البيانات
+    // البحث عن المستخدم حسب الإيميل
     const user = await UserModel.findByEmail(email);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // تحقق من الموافقة (اختياري)
-    if (!user.isApproved) {
-      return res.status(401).json({ error: "User is not approved by admin" });
-    }
-
-    // مقارنة كلمة السر
+    // مقارنة كلمة المرور المدخلة مع المخزنة
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ error: "Invalid password" });
@@ -96,8 +65,8 @@ router.post('/login', async (req, res) => {
 
     res.json({
       message: "Login successful",
-      token,
-      user: { id: user.id, username: user.username, role: user.role }
+    
+      user: { id: user.id, username: user.username}
     });
 
   } catch (error) {
@@ -105,6 +74,7 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ error: "Server error", detail: error.message });
   }
 });
+
 
 module.exports = router;
 
