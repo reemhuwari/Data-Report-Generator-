@@ -1,0 +1,33 @@
+<div class="container py-5">
+  <div class="card shadow p-4">
+    <h2 class="mb-4 text-center">Report History</h2>
+
+    <table class="table table-striped" *ngIf="reports && reports.length">
+      <thead class="table-dark">
+        <tr>
+          <th>#</th>
+          <th>Report Name</th>
+          <th>Date</th>
+          <th>Prompt</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let report of reports; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ report.title }}</td>
+          <td>{{ report.date | date: 'medium' }}</td>
+          <td>{{ report.prompt }}</td>
+          <td>
+            <button class="btn btn-sm btn-outline-primary me-2" (click)="viewReport(report.id)">View</button>
+            <button class="btn btn-sm btn-outline-danger" (click)="deleteReport(report.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!reports || reports.length === 0" class="text-center text-muted">
+      <p>No reports available.</p>
+    </div>
+  </div>
+</div>

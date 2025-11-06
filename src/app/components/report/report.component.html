@@ -1,0 +1,41 @@
+<div class="container py-5">
+  <div class="card shadow p-4">
+    <h2 class="mb-4 text-center">Generate Data Report</h2>
+
+    <form (ngSubmit)="generateReport()">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Upload CSV/Excel File</label>
+        <input
+          type="file"
+          class="form-control"
+          accept=".csv, .xlsx"
+          (change)="onFileSelected($event)"
+        />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Enter Prompt</label>
+        <textarea
+          class="form-control"
+          rows="3"
+          placeholder="Describe what you want the report to summarize..."
+          [(ngModel)]="prompt"
+          name="prompt"
+        ></textarea>
+      </div>
+
+      <button class="btn btn-primary w-100" type="submit">Generate Report</button>
+    </form>
+
+    <div class="mt-5" *ngIf="reportGenerated">
+      <h4>Report Summary</h4>
+      <p>{{ reportText }}</p>
+      <button class="btn btn-outline-success" (click)="downloadPDF()">Download PDF</button>
+
+      <div *ngIf="report?.dataSummary">
+        <h5 class="mt-4">Data Visualization</h5>
+        <app-chart [chartSummary]="report.dataSummary"></app-chart>
+      </div>
+    </div>
+  </div>
+</div>
